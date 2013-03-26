@@ -31,23 +31,6 @@
     [self.layer renderInContext:context];
 }
 
-- (void)renderAllStateAwareRasterImageViewsFromTheBottomUp;
-{
-    for (UIView *view in self.subviews)
-    {
-        [view renderAllStateAwareRasterImageViewsFromTheBottomUp];
-    }
-    if ([self isKindOfClass:[HTRasterView class]])
-    {
-        HTRasterView *rasterImageView = (HTRasterView *)self;
-        BOOL drawsOnMainThread = rasterImageView.drawsOnMainThread;
-        rasterImageView.drawsOnMainThread = YES;
-        [rasterImageView regenerateImage:^{
-            rasterImageView.drawsOnMainThread = drawsOnMainThread;
-        }];
-    }
-}
-
 - (UIImage *)layerMaskImage
 {
     if ([self.layer.mask isKindOfClass:[CAShapeLayer class]])
@@ -137,6 +120,19 @@
         [self unregisterWithAncestor];
     }
     [self htRasterWillMoveToSuperview:newSuperview];
+}
+
+- (void)layoutSubtreeIfNeeded
+{
+    [self layoutIfNeeded];
+    for (UIView *view in self.subviews)
+    {
+        if ([view isKindOfClass:[HTRasterView class]])
+        {
+            [view setNeedsLayout];
+        }
+        [view layoutSubtreeIfNeeded];
+    }
 }
 
 @end

@@ -15,7 +15,7 @@
 
 - (void)drawRect:(CGRect)rect inContext:(CGContextRef)context;
 - (UIImage *)layerMaskImage;
-- (void)renderAllStateAwareRasterImageViewsFromTheBottomUp;
 - (UIView<HTRasterizableView> *)firstAncestorRasterizableView;
+- (void)layoutSubtreeIfNeeded;
 
 @end

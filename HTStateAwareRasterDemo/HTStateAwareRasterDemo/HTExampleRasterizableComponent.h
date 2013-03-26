@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "HTStateAwareRasterImageView.h"
+#import "HTRasterView.h"
 
 @interface HTExampleRasterizableComponent : UIView <HTRasterizableView>
 

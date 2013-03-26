@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		1F93B07D16FE9F070028BAC7 /* UIView+HTRaster.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F93B07C16FE9F070028BAC7 /* UIView+HTRaster.m */; };
+		1F96267417011C67007836BB /* HTRasterView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F96267317011C67007836BB /* HTRasterView.m */; };
 		1FCB6BE1167288C0005582ED /* HTGeneratedImageTableCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 1FCB6BE0167288C0005582ED /* HTGeneratedImageTableCell.m */; };
 		1FCB6BE416728EF9005582ED /* HTCacheKeyCollector.m in Sources */ = {isa = PBXBuildFile; fileRef = 1FCB6BE316728EF9005582ED /* HTCacheKeyCollector.m */; };
 		1FFA170716714B270023BBE6 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1FFA170616714B270023BBE6 /* UIKit.framework */; };
@@ -19,7 +20,6 @@
 		1FFA171916714B270023BBE6 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 1FFA171816714B270023BBE6 /* Default.png */; };
 		1FFA171B16714B270023BBE6 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1FFA171A16714B270023BBE6 /* Default@2x.png */; };
 		1FFA171D16714B270023BBE6 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1FFA171C16714B270023BBE6 /* Default-568h@2x.png */; };
-		1FFA173B16714C570023BBE6 /* HTStateAwareRasterImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1FFA173516714C570023BBE6 /* HTStateAwareRasterImageView.m */; };
 		1FFA173C16714C570023BBE6 /* NSObject+HTPropertyHash.m in Sources */ = {isa = PBXBuildFile; fileRef = 1FFA173716714C570023BBE6 /* NSObject+HTPropertyHash.m */; };
 		1FFA174016714DBA0023BBE6 /* HTExampleTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1FFA173F16714DBA0023BBE6 /* HTExampleTableViewController.m */; };
 		1FFA174316714E530023BBE6 /* HTGeneratedImagesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1FFA174216714E530023BBE6 /* HTGeneratedImagesViewController.m */; };
@@ -33,6 +33,8 @@
 		02CCAE1F6A5E4A36960B75E2 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		1F93B07B16FE9F070028BAC7 /* UIView+HTRaster.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIView+HTRaster.h"; path = "../../UIView+HTRaster.h"; sourceTree = "<group>"; };
 		1F93B07C16FE9F070028BAC7 /* UIView+HTRaster.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIView+HTRaster.m"; path = "../../UIView+HTRaster.m"; sourceTree = "<group>"; };
+		1F96267217011C67007836BB /* HTRasterView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HTRasterView.h; path = ../../HTRasterView.h; sourceTree = "<group>"; };
+		1F96267317011C67007836BB /* HTRasterView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HTRasterView.m; path = ../../HTRasterView.m; sourceTree = "<group>"; };
 		1FCB6BDF167288C0005582ED /* HTGeneratedImageTableCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HTGeneratedImageTableCell.h; sourceTree = "<group>"; };
 		1FCB6BE0167288C0005582ED /* HTGeneratedImageTableCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HTGeneratedImageTableCell.m; sourceTree = "<group>"; };
 		1FCB6BE216728EF9005582ED /* HTCacheKeyCollector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HTCacheKeyCollector.h; sourceTree = "<group>"; };
@@ -50,8 +52,6 @@
 		1FFA171816714B270023BBE6 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
 		1FFA171A16714B270023BBE6 /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
 		1FFA171C16714B270023BBE6 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
-		1FFA173516714C570023BBE6 /* HTStateAwareRasterImageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HTStateAwareRasterImageView.m; path = ../../HTStateAwareRasterImageView.m; sourceTree = "<group>"; };
-		1FFA173616714C570023BBE6 /* HTStateAwareRasterImageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HTStateAwareRasterImageView.h; path = ../../HTStateAwareRasterImageView.h; sourceTree = "<group>"; };
 		1FFA173716714C570023BBE6 /* NSObject+HTPropertyHash.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSObject+HTPropertyHash.m"; path = "../../NSObject+HTPropertyHash.m"; sourceTree = "<group>"; };
 		1FFA173816714C570023BBE6 /* NSObject+HTPropertyHash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSObject+HTPropertyHash.h"; path = "../../NSObject+HTPropertyHash.h"; sourceTree = "<group>"; };
 		1FFA173E16714DBA0023BBE6 /* HTExampleTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HTExampleTableViewController.h; sourceTree = "<group>"; };
@@ -144,10 +144,10 @@
 		1FFA173316714C4C0023BBE6 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				1F96267217011C67007836BB /* HTRasterView.h */,
+				1F96267317011C67007836BB /* HTRasterView.m */,
 				1F93B07B16FE9F070028BAC7 /* UIView+HTRaster.h */,
 				1F93B07C16FE9F070028BAC7 /* UIView+HTRaster.m */,
-				1FFA173616714C570023BBE6 /* HTStateAwareRasterImageView.h */,
-				1FFA173516714C570023BBE6 /* HTStateAwareRasterImageView.m */,
 				1FFA173816714C570023BBE6 /* NSObject+HTPropertyHash.h */,
 				1FFA173716714C570023BBE6 /* NSObject+HTPropertyHash.m */,
 			);
@@ -267,7 +267,6 @@
 			files = (
 				1FFA171316714B270023BBE6 /* main.m in Sources */,
 				1FFA171716714B270023BBE6 /* HTAppDelegate.m in Sources */,
-				1FFA173B16714C570023BBE6 /* HTStateAwareRasterImageView.m in Sources */,
 				1FFA173C16714C570023BBE6 /* NSObject+HTPropertyHash.m in Sources */,
 				1FFA174016714DBA0023BBE6 /* HTExampleTableViewController.m in Sources */,
 				1FFA174316714E530023BBE6 /* HTGeneratedImagesViewController.m in Sources */,
@@ -277,6 +276,7 @@
 				1FCB6BE1167288C0005582ED /* HTGeneratedImageTableCell.m in Sources */,
 				1FCB6BE416728EF9005582ED /* HTCacheKeyCollector.m in Sources */,
 				1F93B07D16FE9F070028BAC7 /* UIView+HTRaster.m in Sources */,
+				1F96267417011C67007836BB /* HTRasterView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
