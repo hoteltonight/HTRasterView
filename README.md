@@ -7,12 +7,11 @@ HTRasterView
 
 HTRasterView is a rasterization system that caches rendered components based on state.  A few advantages over Core Animation's rasterization:
 
-* You only draw a component once for each unique state, and the unique rendered states.  
+* You only draw a component once for each unique state
 * Asynchronous drawing is supported for non-nested use cases
 * Intelligent cached component nesting
 * Components that support edge capping (resizable UIImage) render in their smallest possible frame (performance gain)
 * 'Precompute' GPU-intensive operations like alpha compositing and masking into a single image
-* Never draw a unique state more than once (unless the cache flushes)
 * Switch manually between rasterized version and actual component
 
 Check out the associated blog post at http://engineering.hoteltonight.com/asynchronous-state-aware-component-rasterizat
