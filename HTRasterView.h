@@ -16,12 +16,13 @@ typedef void (^HTSARIVVoidBlock)();
 
 @optional
 - (UIEdgeInsets)capEdgeInsets;
-- (CGFloat)shadowRenderOutset; // if you're drawing shadows or something outside of your frame.
 
 // YES means 1pt between caps vertically and horizontally for draw size.  capEdgeInsets must be implemented for this.
 - (BOOL)useMinimumFrameForCaps;
 
 - (BOOL)shouldRegenerateRasterForKeyPath:(NSString *)keyPath change:(NSDictionary *)dictionary;
+
+- (UIBezierPath *)rasterViewShadowPathForBounds:(CGRect)bounds;
 
 @end
 
