@@ -27,6 +27,7 @@ typedef void (^HTSARIVVoidBlock)();
 - (BOOL)useMinimumFrameForCaps;
 
 - (BOOL)shouldRegenerateRasterForKeyPath:(NSString *)keyPath change:(NSDictionary *)dictionary;
+- (BOOL)shouldRegenerateRaster;
 
 - (UIBezierPath *)rasterViewShadowPathForBounds:(CGRect)bounds;
 
@@ -48,6 +49,7 @@ typedef void (^HTSARIVVoidBlock)();
 @property (atomic, assign) id<HTRasterViewDelegate> delegate;
 @property (nonatomic, assign) BOOL rasterized; // Default YES, change to NO to add rasterizableView as a subview
 @property (nonatomic, readonly) UIImage *image;
+@property (nonatomic, assign, readonly) NSUInteger numberOfDescendants;
 
 - (NSString *)cacheKey;
 - (void)registerDescendantRasterView:(HTRasterView *)descendant;

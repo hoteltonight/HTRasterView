@@ -11,11 +11,11 @@
 
 //  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#import <QuartzCore/QuartzCore.h>
 #import "HTRasterView.h"
 #import "NSObject+HTPropertyHash.h"
 #import "MSCachedAsyncViewDrawing.h"
 #import "UIView+HTRaster.h"
+#import <QuartzCore/QuartzCore.h>
 
 // Uncommenting this SLOWS THINGS DOWN A LOT and will save all images to disk
 //#define HT_DEBUG_SAVEFILES YES
@@ -25,6 +25,7 @@
 
 @interface HTRasterView ()
 
+@property (nonatomic, assign) BOOL implementsShouldRasterizeForKeyPath;
 @property (nonatomic, assign) BOOL implementsShouldRasterize;
 @property (nonatomic, assign) BOOL implementsUseMinimumSizeForCaps;
 @property (nonatomic, assign) BOOL implementsCapEdgeInsets;
@@ -112,7 +113,8 @@
     }
     _rasterizableView.htRasterImageView = self;
     
-    self.implementsShouldRasterize = [self.rasterizableView respondsToSelector:@selector(shouldRegenerateRasterForKeyPath:change:)];
+    self.implementsShouldRasterizeForKeyPath = [self.rasterizableView respondsToSelector:@selector(shouldRegenerateRasterForKeyPath:change:)];
+    self.implementsShouldRasterize = [self.rasterizableView respondsToSelector:@selector(shouldRegenerateRaster)];
     self.implementsUseMinimumSizeForCaps = [self.rasterizableView respondsToSelector:@selector(useMinimumFrameForCaps)];
     self.implementsCapEdgeInsets = [self.rasterizableView respondsToSelector:@selector(capEdgeInsets)];
     self.implementsShadowPath = [self.rasterizableView respondsToSelector:@selector(rasterViewShadowPathForBounds:)];
@@ -179,7 +181,7 @@
     {
         return;
     }
-    if (self.implementsShouldRasterize)
+    if (self.implementsShouldRasterizeForKeyPath)
     {
         if (![self.rasterizableView shouldRegenerateRasterForKeyPath:keyPath change:change])
         {
@@ -220,6 +222,13 @@
     {
         return;
     }
+    if (self.implementsShouldRasterize)
+    {
+        if (![self.rasterizableView shouldRegenerateRaster])
+        {
+            return;
+        }
+    }
     [self layoutRasterizableView];
     CGSize size = self.rasterizableView.bounds.size;
     if ((size.width < 1 || size.height < 1))
@@ -246,9 +255,9 @@
         }
         [bSelf.rasterizableView layoutSubtreeIfNeeded];
         [bSelf.rasterizableView drawRect:frame inContext:context];
-        //#ifdef HT_DEBUG_RASTERLOG
-        //        NSLog(@"%d Drawing: key instance: %d\n\n", (int)self, (int)cacheKey);
-        //#endif
+#ifdef HT_DEBUG_RASTERLOG
+        NSLog(@"%d Drawing: key instance: %d\n\n", (int)self, (int)cacheKey);
+#endif
     };
     
     MSCachedAsyncViewDrawingCompletionBlock completionBlock = ^(UIImage *drawnImage)
@@ -327,7 +336,8 @@
     
     for (HTRasterView *descendantRasterImageView in self.descendantRasterViews)
     {
-        [cacheString appendString:[descendantRasterImageView cacheKey]];
+        NSString *cacheKey = [descendantRasterImageView cacheKey];
+        if (cacheKey) [cacheString appendString:cacheKey];
     }
 #endif
     
@@ -383,6 +393,11 @@
 - (void)unregisterDescendantRasterView:(HTRasterView *)descendant
 {
     [self.descendantRasterViews removeObject:descendant];
+}
+
+- (NSUInteger)numberOfDescendants
+{
+    return [self.descendantRasterViews count];
 }
 
 - (NSString *)description

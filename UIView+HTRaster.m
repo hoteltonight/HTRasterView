@@ -84,7 +84,6 @@
 - (void)setHtRasterImageView:(HTRasterView *)htRasterImageView
 {
     objc_setAssociatedObject(self, (void *)&@selector(htRasterImageView), htRasterImageView, OBJC_ASSOCIATION_ASSIGN);
-    [self performSelector:@selector(checkRegisterWithAncestor) withObject:nil afterDelay:0];
 }
 
 - (void)htRasterDidMoveToSuperview
