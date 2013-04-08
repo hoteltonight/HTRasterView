@@ -9,6 +9,8 @@
 #import <UIKit/UIKit.h>
 #import "HTRasterView.h"
 
+static NSString *const HTRasterViewCheckAncestorRegistrationNotification = @"HTRasterViewCheckAncestorRegistrationNotification";
+
 @interface UIView (HTRaster)
 
 @property (nonatomic, assign) HTRasterView *htRasterImageView;

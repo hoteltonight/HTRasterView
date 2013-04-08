@@ -35,6 +35,7 @@
 @property (nonatomic, strong) NSMutableArray *descendantRasterViews;
 @property (nonatomic, strong) UIView<HTRasterizableView> *rasterizableViewAsSubview;
 @property (nonatomic, strong) UIImageView *imageView;
+@property (nonatomic, weak) HTRasterView *firstAncestorRasterView;
 
 @end
 
@@ -52,6 +53,11 @@
         _rasterized = YES;
         _imageView = [[UIImageView alloc] init];
         [self addSubview:_imageView];
+
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(checkAncestorNotification:)
+                                                     name:HTRasterViewCheckAncestorRegistrationNotification
+                                                   object:nil];
     }
     return self;
 }
@@ -59,7 +65,7 @@
 - (void)layoutSubviews
 {
     [super layoutSubviews];
-    
+
     if (self.rasterizableView)
     {
         [self layoutRasterizableView];
@@ -67,9 +73,7 @@
     self.rasterizableViewAsSubview.frame = self.bounds;
     self.imageView.frame = self.bounds;
     [self.imageView layoutIfNeeded];
-    
-    [self regenerateImage:nil];
-    
+
     if (self.implementsShadowPath)
     {
         self.layer.shadowPath = [self.rasterizableView rasterViewShadowPathForBounds:self.bounds].CGPath;
@@ -131,7 +135,7 @@
         self.layer.shadowOpacity = 0;
     }
     
-    for (NSString *propertyName in [rasterizableView keyPathsThatAffectState])
+    for (NSString *propertyName in [[rasterizableView keyPathsThatAffectState] arrayByAddingObject:@"frame"])
     {
         [rasterizableView addObserver:self forKeyPath:propertyName options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context:nil];
     }
@@ -287,8 +291,8 @@
         }
         
 #ifdef HT_DEBUG_SAVEFILES
-        NSString *fileName = [NSString stringWithFormat:@"/%@-%u.jpg", NSStringFromClass([bSelf.rasterizableView class]), [cacheKey hash]];
-        NSData *imageData = UIImageJPEGRepresentation(drawnImage, 1);
+        NSString *fileName = [NSString stringWithFormat:@"/%@-%u.png", NSStringFromClass([bSelf.rasterizableView class]), [cacheKey hash]];
+        NSData *imageData = UIImagePNGRepresentation(drawnImage);
         NSString *imagePath = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0]
                                stringByAppendingPathComponent:fileName];
         [imageData writeToFile:imagePath atomically:YES];
@@ -383,6 +387,10 @@
 
 - (void)registerDescendantRasterView:(HTRasterView *)descendant
 {
+    if ([self.descendantRasterViews containsObject:descendant])
+    {
+        return;
+    }
     [self.descendantRasterViews addObject:descendant];
     [self.descendantRasterViews sortUsingComparator:^NSComparisonResult(HTRasterView *obj1, HTRasterView *obj2) {
         return [NSStringFromClass([obj1.rasterizableView class]) compare:NSStringFromClass([obj2.rasterizableView class])];
@@ -400,9 +408,39 @@
     return [self.descendantRasterViews count];
 }
 
+- (void)checkRegisterWithAncestor
+{
+    if (!self.firstAncestorRasterView)
+    {
+        HTRasterView *firstAncestorRasterImageView = [self firstAncestorRasterizableView].htRasterImageView;
+        if (firstAncestorRasterImageView)
+        {
+            [firstAncestorRasterImageView registerDescendantRasterView:self];
+        }
+        self.firstAncestorRasterView = firstAncestorRasterImageView;
+    }
+}
+
+- (void)unregisterWithAncestor
+{
+    HTRasterView *firstAncestorRasterImageView = [self firstAncestorRasterizableView].htRasterImageView;
+    if (firstAncestorRasterImageView)
+    {
+        [firstAncestorRasterImageView unregisterDescendantRasterView:self];
+    }
+    self.firstAncestorRasterView = nil;
+}
+
 - (NSString *)description
 {
     return [[super description] stringByAppendingFormat:@", rasterizableView: %@, image: %@", NSStringFromClass([self.rasterizableView class]), self.imageView.image];
+}
+
+#pragma mark - Notifications
+
+- (void)checkAncestorNotification:(NSNotification *)notification
+{
+    [self checkRegisterWithAncestor];
 }
 
 @end

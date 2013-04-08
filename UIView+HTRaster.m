@@ -13,6 +13,7 @@
 //
 
 #import "UIView+HTRaster.h"
+#import "HTRasterView+Private.h"
 #import <QuartzCore/QuartzCore.h>
 #import <objc/runtime.h>
 
@@ -68,7 +69,7 @@
     while (view.superview)
     {
         view = view.superview;
-        if (view && view != self && [view conformsToProtocol:@protocol(HTRasterizableView)] && view.htRasterImageView)
+        if (view && view != self && view.htRasterImageView)
         {
             return (UIView<HTRasterizableView> *)view;
         }
@@ -89,30 +90,10 @@
 - (void)htRasterDidMoveToSuperview
 {
     [self htRasterDidMoveToSuperview];
-    if (![self isKindOfClass:[HTRasterView class]])
-    {
-        return;
-    }
-    [self performSelector:@selector(checkRegisterWithAncestor) withObject:nil afterDelay:0];
+    [[NSNotificationCenter defaultCenter] postNotificationName:HTRasterViewCheckAncestorRegistrationNotification
+                                                        object:self];
 }
 
-- (void)checkRegisterWithAncestor
-{
-    HTRasterView *firstAncestorRasterImageView = [self firstAncestorRasterizableView].htRasterImageView;
-    if (firstAncestorRasterImageView)
-    {
-        [firstAncestorRasterImageView registerDescendantRasterView:(HTRasterView *) self];
-    }
-}
-
-- (void)unregisterWithAncestor
-{
-    HTRasterView *firstAncestorRasterImageView = [self firstAncestorRasterizableView].htRasterImageView;
-    if (firstAncestorRasterImageView)
-    {
-        [firstAncestorRasterImageView unregisterDescendantRasterView:(HTRasterView *) self];
-    }
-}
 
 - (void)htRasterWillMoveToSuperview:(UIView *)newSuperview
 {
@@ -122,7 +103,7 @@
     }
     if (!newSuperview)
     {
-        [self unregisterWithAncestor];
+        [(HTRasterView *)self unregisterWithAncestor];
     }
     [self htRasterWillMoveToSuperview:newSuperview];
 }
