@@ -19,12 +19,6 @@
 
 @implementation UIView (HTRaster)
 
-+ (void)load
-{
-    method_exchangeImplementations(class_getInstanceMethod(self, @selector(didMoveToSuperview)), class_getInstanceMethod(self, @selector(htRasterDidMoveToSuperview)));
-    method_exchangeImplementations(class_getInstanceMethod(self, @selector(willMoveToSuperview:)), class_getInstanceMethod(self, @selector(htRasterWillMoveToSuperview:)));
-}
-
 - (void)drawRect:(CGRect)rect inContext:(CGContextRef)context;
 {
     [self layoutSubviews];
@@ -63,20 +57,6 @@
     return outputImage;
 }
 
-- (UIView<HTRasterizableView> *)firstAncestorRasterizableView;
-{
-    UIView *view = self;
-    while (view.superview)
-    {
-        view = view.superview;
-        if (view && view != self && view.htRasterImageView)
-        {
-            return (UIView<HTRasterizableView> *)view;
-        }
-    }
-    return nil;
-}
-
 - (HTRasterView *)htRasterImageView
 {
     return objc_getAssociatedObject(self, (void *)&@selector(htRasterImageView));
@@ -85,40 +65,6 @@
 - (void)setHtRasterImageView:(HTRasterView *)htRasterImageView
 {
     objc_setAssociatedObject(self, (void *)&@selector(htRasterImageView), htRasterImageView, OBJC_ASSOCIATION_ASSIGN);
-}
-
-- (void)htRasterDidMoveToSuperview
-{
-    [self htRasterDidMoveToSuperview];
-    [[NSNotificationCenter defaultCenter] postNotificationName:HTRasterViewCheckAncestorRegistrationNotification
-                                                        object:self];
-}
-
-
-- (void)htRasterWillMoveToSuperview:(UIView *)newSuperview
-{
-    if (![self isKindOfClass:[HTRasterView class]])
-    {
-        return;
-    }
-    if (!newSuperview)
-    {
-        [(HTRasterView *)self unregisterWithAncestor];
-    }
-    [self htRasterWillMoveToSuperview:newSuperview];
-}
-
-- (void)layoutSubtreeIfNeeded
-{
-    [self layoutIfNeeded];
-    for (UIView *view in self.subviews)
-    {
-        if ([view isKindOfClass:[HTRasterView class]])
-        {
-            [view setNeedsLayout];
-        }
-        [view layoutSubtreeIfNeeded];
-    }
 }
 
 @end

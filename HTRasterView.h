@@ -49,11 +49,8 @@ typedef void (^HTSARIVVoidBlock)();
 @property (atomic, assign) id<HTRasterViewDelegate> delegate;
 @property (nonatomic, assign) BOOL rasterized; // Default YES, change to NO to add rasterizableView as a subview
 @property (nonatomic, readonly) UIImage *image;
-@property (nonatomic, assign, readonly) NSUInteger numberOfDescendants;
 
 - (NSString *)cacheKey;
-- (void)registerDescendantRasterView:(HTRasterView *)descendant;
-- (void)unregisterDescendantRasterView:(HTRasterView *)descendant;
 
 // For prerendering only
 @property (nonatomic, assign) BOOL kvoEnabled;

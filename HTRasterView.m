@@ -32,10 +32,8 @@
 @property (nonatomic, assign) BOOL implementsShadowPath;
 @property (atomic, strong) NSOperation *drawingOperation;
 @property (atomic, strong) NSString *currentRenderingCacheKey; // For avoiding race conditions while drawsOnMainThread = NO
-@property (nonatomic, strong) NSMutableArray *descendantRasterViews;
 @property (nonatomic, strong) UIView<HTRasterizableView> *rasterizableViewAsSubview;
 @property (nonatomic, strong) UIImageView *imageView;
-@property (nonatomic, weak) HTRasterView *firstAncestorRasterView;
 
 @end
 
@@ -49,15 +47,10 @@
     {
         _kvoEnabled = YES;
         _drawsOnMainThread = YES;
-        _descendantRasterViews = [NSMutableArray array];
         _rasterized = YES;
         _imageView = [[UIImageView alloc] init];
+        _imageView.opaque = YES;
         [self addSubview:_imageView];
-
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(checkAncestorNotification:)
-                                                     name:HTRasterViewCheckAncestorRegistrationNotification
-                                                   object:nil];
     }
     return self;
 }
@@ -69,6 +62,7 @@
     if (self.rasterizableView)
     {
         [self layoutRasterizableView];
+        [self regenerateImage:nil];
     }
     self.rasterizableViewAsSubview.frame = self.bounds;
     self.imageView.frame = self.bounds;
@@ -94,7 +88,6 @@
     }
     
     self.rasterizableView.frame = (CGRect){ .origin = CGPointZero, .size = size };
-    [self.rasterizableView layoutSubtreeIfNeeded];
 }
 
 - (void)dealloc
@@ -135,7 +128,7 @@
         self.layer.shadowOpacity = 0;
     }
     
-    for (NSString *propertyName in [[rasterizableView keyPathsThatAffectState] arrayByAddingObject:@"frame"])
+    for (NSString *propertyName in [rasterizableView keyPathsThatAffectState])
     {
         [rasterizableView addObserver:self forKeyPath:propertyName options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context:nil];
     }
@@ -249,7 +242,7 @@
     __unsafe_unretained HTRasterView *bSelf = self;
     MSCachedAsyncViewDrawingDrawBlock drawBlock = ^(CGRect frame, CGContextRef context)
     {
-        if (self.currentRenderingCacheKey != cacheKey)
+        if (self.drawsOnMainThread && self.currentRenderingCacheKey != cacheKey)
         {
             return;
         }
@@ -257,7 +250,6 @@
         {
             [bSelf.delegate rasterViewWillRegenerateImage:bSelf];
         }
-        [bSelf.rasterizableView layoutSubtreeIfNeeded];
         [bSelf.rasterizableView drawRect:frame inContext:context];
 #ifdef HT_DEBUG_RASTERLOG
         NSLog(@"%d Drawing: key instance: %d\n\n", (int)self, (int)cacheKey);
@@ -266,7 +258,7 @@
     
     MSCachedAsyncViewDrawingCompletionBlock completionBlock = ^(UIImage *drawnImage)
     {
-        if (self.currentRenderingCacheKey != cacheKey)
+        if (self.drawsOnMainThread && self.currentRenderingCacheKey != cacheKey)
         {
             //            NSLog(@"NOT USING %d BECAUSE != current %d", (int)cacheKey, (int)self.currentRenderingCacheKey);
             return;
@@ -282,7 +274,6 @@
 #endif
             
             bSelf.imageView.image = drawnImage;
-            [self informFirstAncestorRasterImageViewThatWeRegenerated];
         }
         
         if ([bSelf.delegate respondsToSelector:@selector(rasterViewImageLoaded:)])
@@ -318,34 +309,10 @@
                                                                            completionBlock:completionBlock];
 }
 
-- (void)informFirstAncestorRasterImageViewThatWeRegenerated
-{
-    [[self firstAncestorRasterizableView].htRasterImageView regenerateImage:nil];
-}
-
 - (NSString *)cacheKey
 {
-#ifdef HT_DEBUG_RASTERLOG
-    NSMutableString *cacheString = [[[self.rasterizableView hashStringForKeyPaths:[self.rasterizableView keyPathsThatAffectState]] stringByReplacingOccurrencesOfString:@"\n"
-                                                                                                                                                             withString:@" "] mutableCopy];
-    
-    for (HTRasterView *descendantRasterImageView in self.descendantRasterViews)
-    {
-        NSString *descendantCacheKey = [[descendantRasterImageView cacheKey] stringByReplacingOccurrencesOfString:@"\n"
-                                                                                                       withString:@"\n\t"];
-        [cacheString appendFormat:@"\n\t%@", descendantCacheKey];
-    }
-#else
-    NSMutableString *cacheString = [[self.rasterizableView hashStringForKeyPaths:[self.rasterizableView keyPathsThatAffectState]] mutableCopy];
-    
-    for (HTRasterView *descendantRasterImageView in self.descendantRasterViews)
-    {
-        NSString *cacheKey = [descendantRasterImageView cacheKey];
-        if (cacheKey) [cacheString appendString:cacheKey];
-    }
-#endif
-    
-    return [cacheString copy];
+    NSString *cacheString = [self.rasterizableView hashStringForKeyPaths:[self.rasterizableView keyPathsThatAffectState]];
+    return cacheString;
 }
 
 - (void)willMoveToWindow:(UIWindow *)newWindow
@@ -383,64 +350,9 @@
     }
 }
 
-#pragma mark - Descendant rasterization
-
-- (void)registerDescendantRasterView:(HTRasterView *)descendant
-{
-    if ([self.descendantRasterViews containsObject:descendant])
-    {
-        return;
-    }
-    [self.descendantRasterViews addObject:descendant];
-    [self.descendantRasterViews sortUsingComparator:^NSComparisonResult(HTRasterView *obj1, HTRasterView *obj2) {
-        return [NSStringFromClass([obj1.rasterizableView class]) compare:NSStringFromClass([obj2.rasterizableView class])];
-    }];
-    [self regenerateImage:nil];
-}
-
-- (void)unregisterDescendantRasterView:(HTRasterView *)descendant
-{
-    [self.descendantRasterViews removeObject:descendant];
-}
-
-- (NSUInteger)numberOfDescendants
-{
-    return [self.descendantRasterViews count];
-}
-
-- (void)checkRegisterWithAncestor
-{
-    if (!self.firstAncestorRasterView)
-    {
-        HTRasterView *firstAncestorRasterImageView = [self firstAncestorRasterizableView].htRasterImageView;
-        if (firstAncestorRasterImageView)
-        {
-            [firstAncestorRasterImageView registerDescendantRasterView:self];
-        }
-        self.firstAncestorRasterView = firstAncestorRasterImageView;
-    }
-}
-
-- (void)unregisterWithAncestor
-{
-    HTRasterView *firstAncestorRasterImageView = [self firstAncestorRasterizableView].htRasterImageView;
-    if (firstAncestorRasterImageView)
-    {
-        [firstAncestorRasterImageView unregisterDescendantRasterView:self];
-    }
-    self.firstAncestorRasterView = nil;
-}
-
 - (NSString *)description
 {
     return [[super description] stringByAppendingFormat:@", rasterizableView: %@, image: %@", NSStringFromClass([self.rasterizableView class]), self.imageView.image];
-}
-
-#pragma mark - Notifications
-
-- (void)checkAncestorNotification:(NSNotification *)notification
-{
-    [self checkRegisterWithAncestor];
 }
 
 @end

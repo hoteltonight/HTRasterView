@@ -9,15 +9,11 @@
 #import <UIKit/UIKit.h>
 #import "HTRasterView.h"
 
-static NSString *const HTRasterViewCheckAncestorRegistrationNotification = @"HTRasterViewCheckAncestorRegistrationNotification";
-
 @interface UIView (HTRaster)
 
 @property (nonatomic, assign) HTRasterView *htRasterImageView;
 
 - (void)drawRect:(CGRect)rect inContext:(CGContextRef)context;
 - (UIImage *)layerMaskImage;
-- (UIView<HTRasterizableView> *)firstAncestorRasterizableView;
-- (void)layoutSubtreeIfNeeded;
 
 @end
