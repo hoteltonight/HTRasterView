@@ -21,7 +21,16 @@
 
 - (void)drawRect:(CGRect)rect inContext:(CGContextRef)context;
 {
-    [self layoutSubviews];
+    if ([NSThread isMainThread])
+    {
+        [self setNeedsLayout];
+        [self layoutIfNeeded];
+    } else {
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            [self setNeedsLayout];
+            [self layoutIfNeeded];
+        });
+    }
     self.layer.contentsScale = [[UIScreen mainScreen] scale];
     self.layer.mask.contentsScale = [[UIScreen mainScreen] scale];
     if (self.layer.mask)

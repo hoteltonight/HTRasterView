@@ -30,6 +30,7 @@ typedef void (^HTSARIVVoidBlock)();
 - (BOOL)shouldRegenerateRaster;
 
 - (UIBezierPath *)rasterViewShadowPathForBounds:(CGRect)bounds;
+- (UIImage *)placeholderImage;
 
 @end
 
@@ -49,6 +50,7 @@ typedef void (^HTSARIVVoidBlock)();
 @property (atomic, assign) id<HTRasterViewDelegate> delegate;
 @property (nonatomic, assign) BOOL rasterized; // Default YES, change to NO to add rasterizableView as a subview
 @property (nonatomic, readonly) UIImage *image;
+@property (nonatomic, assign, readonly) BOOL loaded; // When drawsOnMainThread = NO, this will return YES if the current state is rendered
 
 - (NSString *)cacheKey;
 
