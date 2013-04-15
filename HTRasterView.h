@@ -47,7 +47,7 @@ typedef void (^HTSARIVVoidBlock)();
 
 @property (nonatomic, strong) UIView<HTRasterizableView> *rasterizableView;
 @property (nonatomic, assign) BOOL drawsOnMainThread;
-@property (atomic, assign) id<HTRasterViewDelegate> delegate;
+@property (atomic, weak) id<HTRasterViewDelegate> delegate;
 @property (nonatomic, assign) BOOL rasterized; // Default YES, change to NO to add rasterizableView as a subview
 @property (nonatomic, readonly) UIImage *image;
 @property (nonatomic, assign, readonly) BOOL loaded; // When drawsOnMainThread = NO, this will return YES if the current state is rendered
