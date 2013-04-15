@@ -106,6 +106,10 @@
 
 - (void)setRasterizableView:(UIView<HTRasterizableView> *)rasterizableView
 {
+    [self setRasterizableView:rasterizableView generatePlaceholder:YES];
+}
+- (void)setRasterizableView:(UIView<HTRasterizableView> *)rasterizableView generatePlaceholder:(BOOL)generatePlaceholder
+{
     [self removeAllObservers];
     _rasterizableView.htRasterImageView = nil;
     _rasterizableView = rasterizableView;
@@ -122,7 +126,7 @@
     self.implementsShadowPath = [self.rasterizableView respondsToSelector:@selector(rasterViewShadowPathForBounds:)];
     self.implementsPlaceholderImage = [self.rasterizableView respondsToSelector:@selector(placeholderImage)];
 
-    if (self.implementsPlaceholderImage)
+    if (self.implementsPlaceholderImage && generatePlaceholder)
     {
         self.placeholderImageView = [[UIImageView alloc] initWithImage:[self.rasterizableView placeholderImage]];
         [self insertSubview:self.placeholderImageView atIndex:0];
@@ -157,7 +161,7 @@
     if (rasterized)
     {
         [self.rasterizableViewAsSubview removeFromSuperview];
-        self.rasterizableView = self.rasterizableViewAsSubview;
+        [self setRasterizableView:self.rasterizableViewAsSubview generatePlaceholder:NO];
         self.rasterizableViewAsSubview = nil;
     }
     else
