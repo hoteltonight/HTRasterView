@@ -13,28 +13,24 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "NSObject+HTPropertyHash.h"
+
+@class HTRasterView;
 
 typedef void (^HTSARIVVoidBlock)();
 
-@protocol HTRasterizableView <NSObject>
-
-- (NSArray *)keyPathsThatAffectState;
+@protocol HTRasterizableView <HTStateTrackable, NSObject>
 
 @optional
 - (UIEdgeInsets)capEdgeInsets;
 
-// YES means 1pt between caps vertically and horizontally for draw size.  capEdgeInsets must be implemented for this.
-- (BOOL)useMinimumFrameForCaps;
-
-- (BOOL)shouldRegenerateRasterForKeyPath:(NSString *)keyPath change:(NSDictionary *)dictionary;
+- (BOOL)useMinimumFrameForCaps; // YES means 1pt between caps vertically and horizontally for draw size.  capEdgeInsets must be implemented for this.
 - (BOOL)shouldRegenerateRaster;
-
 - (UIBezierPath *)rasterViewShadowPathForBounds:(CGRect)bounds;
 - (UIImage *)placeholderImage;
 
 @end
 
-@class HTRasterView;
 @protocol HTRasterViewDelegate <NSObject>
 
 @optional
