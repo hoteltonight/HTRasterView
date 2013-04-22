@@ -96,6 +96,9 @@
 
 - (void)calculateStateHash
 {
+    [NSObject cancelPreviousPerformRequestsWithTarget:self
+                                             selector:@selector(calculateStateHash)
+                                               object:nil];
     if (![self conformsToProtocol:@protocol(HTStateTrackable)])
     {
         return;

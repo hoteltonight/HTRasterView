@@ -13,7 +13,7 @@
                         change:(NSDictionary *)change
                        context:(void *)context
 {
-    [self.owner calculateStateHash];
+    [self.owner performSelector:@selector(calculateStateHash) withObject:nil afterDelay:0.1 inModes:@[NSRunLoopCommonModes]];
 }
 
 @end

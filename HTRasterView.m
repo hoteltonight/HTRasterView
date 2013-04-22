@@ -86,13 +86,14 @@
 
     if ([self useMinimumCapSize])
     {
-#if HT_DEBUG_RASTERLEVEL == 3
+#if HT_DEBUG_RASTERLEVEL >= 3
         NSLog(@"Using minimum cap size for %@", NSStringFromClass([self.rasterizableView class]));
 #endif
         size = CGSizeMake(edgeInsets.left + edgeInsets.right + 1, edgeInsets.top + edgeInsets.bottom + 1);
     }
 
     self.rasterizableView.frame = (CGRect){ .origin = CGPointZero, .size = size };
+    [self.rasterizableView layoutIfNeeded];
 }
 
 - (void)dealloc
@@ -108,6 +109,7 @@
 {
     [self setRasterizableView:rasterizableView generatePlaceholder:YES];
 }
+
 - (void)setRasterizableView:(UIView<HTRasterizableView> *)rasterizableView generatePlaceholder:(BOOL)generatePlaceholder
 {
     [self removeAllObservers];
@@ -125,10 +127,9 @@
     self.implementsShadowPath = [self.rasterizableView respondsToSelector:@selector(rasterViewShadowPathForBounds:)];
     self.implementsPlaceholderImage = [self.rasterizableView respondsToSelector:@selector(placeholderImage)];
 
-    if (self.implementsPlaceholderImage && generatePlaceholder)
+    if (generatePlaceholder)
     {
-        self.placeholderImageView = [[UIImageView alloc] initWithImage:[self.rasterizableView placeholderImage]];
-        [self insertSubview:self.placeholderImageView atIndex:0];
+        [self generatePlaceholder];
     }
 
     if (self.implementsShadowPath)
@@ -147,6 +148,17 @@
     [rasterizableView addObserver:self forKeyPath:@"stateHash" options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context:nil];
 
     [self setNeedsLayout];
+}
+
+- (void)generatePlaceholder
+{
+    if (self.implementsPlaceholderImage)
+    {
+        [self.placeholderImageView removeFromSuperview];
+        self.placeholderImageView = [[UIImageView alloc] initWithImage:[self.rasterizableView placeholderImage]];
+        [self insertSubview:self.placeholderImageView atIndex:0];
+        self.imageView.image = nil;
+    }
 }
 
 - (void)setRasterized:(BOOL)rasterized
@@ -181,6 +193,7 @@
 - (void)removeAllObservers;
 {
     [_rasterizableView removeObserver:self forKeyPath:@"stateHash"];
+    _rasterizableView.shouldTrackState = NO;
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
@@ -209,9 +222,6 @@
 
 - (void)regenerateImage:(HTSARIVVoidBlock)complete
 {
-#if HT_DEBUG_RASTERLEVEL == 3
-    NSLog(@"Potential regenerate %@", NSStringFromClass([self.rasterizableView class]));
-#endif
     if (!self.rasterizableView)
     {
         return;
@@ -220,6 +230,9 @@
     {
         if (![self.rasterizableView shouldRegenerateRaster])
         {
+#if HT_DEBUG_RASTERLEVEL >= 3
+            NSLog(@"Cancelled regenerate via shouldRegenerateRaster: %@", NSStringFromClass([self.rasterizableView class]));
+#endif
             return;
         }
     }
@@ -227,27 +240,20 @@
     CGSize size = self.rasterizableView.bounds.size;
     if ((size.width < 1 || size.height < 1))
     {
-#if HT_DEBUG_RASTERLEVEL == 3
+#if HT_DEBUG_RASTERLEVEL >= 3
         NSLog(@"Too small %@", NSStringFromClass([self.rasterizableView class]));
 #endif
         return;
     }
     __block NSString *cacheKey = [self cacheKey];
-#if HT_DEBUG_RASTERLEVEL == 2
+#if HT_DEBUG_RASTERLEVEL >= 2
         NSLog(@"%d Maybe drawing cache instance: %d\n", (int)self, (int)cacheKey);
 #endif
     __weak HTRasterView *wSelf = self;
     MSCachedAsyncViewDrawingDrawBlock drawBlock = ^ BOOL (CGRect frame, CGContextRef context)
     {
-        if (self.currentRenderingCacheKey != cacheKey)
+        if (cacheKey != self.currentRenderingCacheKey || cacheKey != [self cacheKey])
         {
-            return NO;
-        }
-        if (![cacheKey isEqualToString:[self cacheKey]])
-        {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [wSelf regenerateImage:complete];
-            });
             return NO;
         }
         if ([wSelf.delegate respondsToSelector:@selector(rasterViewWillRegenerateImage:)])
@@ -255,7 +261,11 @@
             [wSelf.delegate rasterViewWillRegenerateImage:wSelf];
         }
         [wSelf.rasterizableView drawRect:frame inContext:context];
-#if HT_DEBUG_RASTERLEVEL == 2
+        if (cacheKey != self.currentRenderingCacheKey || cacheKey != [self cacheKey])
+        {
+            return NO;
+        }
+#if HT_DEBUG_RASTERLEVEL >= 2
         NSLog(@"%d Drawing: key instance: %d\n\n", (int)wSelf, (int)cacheKey);
 #endif
         return YES;
@@ -273,7 +283,7 @@
         }
         if (drawnImage != wSelf.imageView.image)
         {
-#if HT_DEBUG_RASTERLEVEL == 1
+#if HT_DEBUG_RASTERLEVEL >= 1
             NSLog(@"%d Using key instance: %d, Key: \n%@\n\n", (int)wSelf, (int)cacheKey, cacheKey);
 #endif
 
@@ -299,7 +309,7 @@
         }
 
 #if HT_DEBUG_SAVEFILES
-        NSString *fileName = [NSString stringWithFormat:@"/%@-%u.png", NSStringFromClass([bSelf.rasterizableView class]), [cacheKey hash]];
+        NSString *fileName = [NSString stringWithFormat:@"/%@-%u.png", NSStringFromClass([wSelf.rasterizableView class]), [cacheKey hash]];
         NSData *imageData = UIImagePNGRepresentation(drawnImage);
         NSString *imagePath = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0]
                                stringByAppendingPathComponent:fileName];
@@ -310,7 +320,7 @@
     };
 
     [self.drawingOperation cancel];
-#if HT_DEBUG_RASTERLEVEL == 3
+#if HT_DEBUG_RASTERLEVEL >= 3
     NSLog(@"actual regen %@ size: %@", NSStringFromClass([self.rasterizableView class]), NSStringFromCGSize(size));
 #endif
     self.currentRenderingCacheKey = cacheKey;

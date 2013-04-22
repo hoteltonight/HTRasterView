@@ -49,6 +49,7 @@ typedef void (^HTSARIVVoidBlock)();
 @property (nonatomic, assign, readonly) BOOL loaded; // When drawsOnMainThread = NO, this will return YES if the current state is rendered
 
 - (NSString *)cacheKey;
+- (void)generatePlaceholder;
 
 // For prerendering only
 @property (nonatomic, assign) BOOL kvoEnabled;
