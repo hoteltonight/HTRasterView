@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		1F93B07D16FE9F070028BAC7 /* UIView+HTRaster.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F93B07C16FE9F070028BAC7 /* UIView+HTRaster.m */; };
 		1F96267417011C67007836BB /* HTRasterView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F96267317011C67007836BB /* HTRasterView.m */; };
+		1FB5B7721725BAB6002DD49F /* HTStateTrackableWorker.m in Sources */ = {isa = PBXBuildFile; fileRef = 1FB5B7711725BAB5002DD49F /* HTStateTrackableWorker.m */; };
 		1FCB6BE1167288C0005582ED /* HTGeneratedImageTableCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 1FCB6BE0167288C0005582ED /* HTGeneratedImageTableCell.m */; };
 		1FCB6BE416728EF9005582ED /* HTCacheKeyCollector.m in Sources */ = {isa = PBXBuildFile; fileRef = 1FCB6BE316728EF9005582ED /* HTCacheKeyCollector.m */; };
 		1FFA170716714B270023BBE6 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1FFA170616714B270023BBE6 /* UIKit.framework */; };
@@ -35,6 +36,9 @@
 		1F93B07C16FE9F070028BAC7 /* UIView+HTRaster.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIView+HTRaster.m"; path = "../../UIView+HTRaster.m"; sourceTree = "<group>"; };
 		1F96267217011C67007836BB /* HTRasterView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HTRasterView.h; path = ../../HTRasterView.h; sourceTree = "<group>"; };
 		1F96267317011C67007836BB /* HTRasterView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HTRasterView.m; path = ../../HTRasterView.m; sourceTree = "<group>"; };
+		1FB5B76F1725BAB5002DD49F /* HTRasterView+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "HTRasterView+Private.h"; path = "../../HTRasterView+Private.h"; sourceTree = "<group>"; };
+		1FB5B7701725BAB5002DD49F /* HTStateTrackableWorker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HTStateTrackableWorker.h; path = ../../HTStateTrackableWorker.h; sourceTree = "<group>"; };
+		1FB5B7711725BAB5002DD49F /* HTStateTrackableWorker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HTStateTrackableWorker.m; path = ../../HTStateTrackableWorker.m; sourceTree = "<group>"; };
 		1FCB6BDF167288C0005582ED /* HTGeneratedImageTableCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HTGeneratedImageTableCell.h; sourceTree = "<group>"; };
 		1FCB6BE0167288C0005582ED /* HTGeneratedImageTableCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HTGeneratedImageTableCell.m; sourceTree = "<group>"; };
 		1FCB6BE216728EF9005582ED /* HTCacheKeyCollector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HTCacheKeyCollector.h; sourceTree = "<group>"; };
@@ -144,6 +148,9 @@
 		1FFA173316714C4C0023BBE6 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				1FB5B76F1725BAB5002DD49F /* HTRasterView+Private.h */,
+				1FB5B7701725BAB5002DD49F /* HTStateTrackableWorker.h */,
+				1FB5B7711725BAB5002DD49F /* HTStateTrackableWorker.m */,
 				1F96267217011C67007836BB /* HTRasterView.h */,
 				1F96267317011C67007836BB /* HTRasterView.m */,
 				1F93B07B16FE9F070028BAC7 /* UIView+HTRaster.h */,
@@ -277,6 +284,7 @@
 				1FCB6BE416728EF9005582ED /* HTCacheKeyCollector.m in Sources */,
 				1F93B07D16FE9F070028BAC7 /* UIView+HTRaster.m in Sources */,
 				1F96267417011C67007836BB /* HTRasterView.m in Sources */,
+				1FB5B7721725BAB6002DD49F /* HTStateTrackableWorker.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
