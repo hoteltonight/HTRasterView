@@ -181,6 +181,7 @@
         self.rasterizableView = nil;
         [self setNeedsLayout];
     }
+    self.imageView.hidden = !rasterized;
 }
 
 - (UIImage *)image
